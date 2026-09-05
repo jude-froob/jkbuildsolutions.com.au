@@ -1,0 +1,265 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Submit a Project &mdash; JK Build Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Work Sans', system-ui, sans-serif; }
+  a { color: oklch(50% 0.14 40); text-decoration: none; }
+  a:hover { color: oklch(42% 0.14 40); }
+  .h-serif { font-family: 'Newsreader', Georgia, serif; }
+  .navlink { transition: color .15s ease; }
+  .navlink:hover { color: oklch(93% 0.01 80) !important; }
+
+  label { display: block; font-size: 13px; letter-spacing: .04em; color: oklch(40% 0.005 75); margin-bottom: 6px; }
+  .field { margin-bottom: 20px; }
+  input[type="text"], input[type="password"], textarea {
+    width: 100%; font: inherit; font-size: 15px; padding: 10px 12px;
+    border: 1px solid oklch(85% 0.005 75); border-radius: 4px;
+    background: oklch(99% 0.002 80); color: oklch(18% 0.005 75);
+  }
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+    outline: 2px solid oklch(50% 0.14 40 / 40%); outline-offset: 1px;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 14px 22px; }
+  .tag-row label { display: flex; align-items: center; gap: 8px; font-size: 14px; color: oklch(30% 0.005 75); margin: 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  #photo-previews { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  #photo-previews .thumb { width: 96px; height: 96px; border-radius: 4px; overflow: hidden; position: relative; background: oklch(90% 0.005 75); }
+  #photo-previews .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #photo-previews .thumb.error { display: flex; align-items: center; justify-content: center; font-size: 11px; text-align: center; padding: 6px; color: oklch(45% 0.14 30); }
+  #submit-btn {
+    display: inline-flex; align-items: center; gap: 10px; background: oklch(50% 0.14 40);
+    color: oklch(98% 0 0); font-weight: 600; font-size: 15px; padding: 14px 28px;
+    border: none; border-radius: 3px; cursor: pointer;
+  }
+  #submit-btn:disabled { opacity: .55; cursor: not-allowed; }
+  #form-status { margin-top: 16px; font-size: 14px; }
+  #form-status.error { color: oklch(45% 0.18 30); }
+  #form-status.success { color: oklch(40% 0.12 150); }
+</style>
+</head>
+<body>
+
+<div style="background: oklch(97% 0.006 80); color: oklch(18% 0.005 75); width: 100%; min-height: 100vh;">
+
+  <!-- NAV -->
+  <div style="background: oklch(15% 0.008 75); display:flex; align-items:center; justify-content:space-between; padding: 16px 64px;">
+    <img src="Logo/logo-white-no-bg.png" alt="JK Build Solutions" style="height: 60px; width: auto;">
+    <div style="display:flex; align-items:center; gap:26px;">
+      <a class="navlink" href="index.html#services" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">SERVICES</a>
+      <a class="navlink" href="projects.html" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">PROJECTS</a>
+      <a class="navlink" href="index.html#contact" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">CONTACT</a>
+    </div>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div style="padding: 56px 64px 40px; max-width: 720px; margin: 0 auto;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom: 18px;">
+      <span style="width:28px; height:1px; background: oklch(50% 0.14 40);"></span>
+      <span style="font-size: 13px; letter-spacing: .12em; color: oklch(50% 0.005 75);">INTERNAL USE</span>
+    </div>
+    <h1 class="h-serif" style="font-size: 38px; font-weight: 500; font-style: italic; margin: 0 0 12px;">Submit a Completed Project</h1>
+    <p style="font-size: 15px; line-height: 1.6; color: oklch(45% 0.005 75); margin:0;">Fills in a project sheet PDF and adds it to the gallery automatically. Photos are resized in your browser before uploading.</p>
+  </div>
+
+  <!-- FORM -->
+  <div style="padding: 0 64px 72px; max-width: 720px; margin: 0 auto;">
+    <form id="project-form">
+
+      <div class="field">
+        <label for="passphrase">Access passphrase</label>
+        <input type="password" id="passphrase" name="passphrase" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="project-title">Project title</label>
+        <input type="text" id="project-title" name="project-title" required placeholder="Black Cladding Shed">
+      </div>
+
+      <div class="field">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" required placeholder="Beaudesert, QLD">
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="scope">Scope</label>
+          <input type="text" id="scope" name="scope" required placeholder="Shed design & construction">
+        </div>
+        <div class="field">
+          <label for="size">Size</label>
+          <input type="text" id="size" name="size" required placeholder="9m x 6m">
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="materials">Materials</label>
+          <input type="text" id="materials" name="materials" required placeholder="Colorbond® steel, dark finish">
+        </div>
+        <div class="field">
+          <label for="duration">Duration</label>
+          <input type="text" id="duration" name="duration" required placeholder="6 weeks">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required placeholder="One or two sentences describing the project."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Tags</label>
+        <div class="tag-row">
+          <label><input type="checkbox" name="tags" value="Council approved"> Council approved</label>
+          <label><input type="checkbox" name="tags" value="Engineered"> Engineered</label>
+          <label><input type="checkbox" name="tags" value="Fully managed"> Fully managed</label>
+          <label><input type="checkbox" name="tags" value="Custom design"> Custom design</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="tags-other">Additional tags (comma-separated, optional)</label>
+        <input type="text" id="tags-other" name="tags-other" placeholder="Renovation, Fast turnaround">
+      </div>
+
+      <div class="field">
+        <label for="photos-input">Project photos</label>
+        <input type="file" id="photos-input" accept="image/*" multiple required>
+        <div id="photo-previews"></div>
+      </div>
+
+      <button type="submit" id="submit-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+        Submit project
+      </button>
+
+      <div id="form-status"></div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  const WORKER_URL = 'https://jk-new-pdf-project-form.judith-kelmanson.workers.dev/';
+  const MAX_WIDTH = 1600;
+  const JPEG_QUALITY = 0.8;
+  const MAX_PHOTOS = 8;
+
+  const form = document.getElementById('project-form');
+  const photosInput = document.getElementById('photos-input');
+  const previews = document.getElementById('photo-previews');
+  const statusEl = document.getElementById('form-status');
+  const submitBtn = document.getElementById('submit-btn');
+
+  let resizedFiles = [];
+
+  async function resizeImage(file, maxWidth = MAX_WIDTH, quality = JPEG_QUALITY) {
+    const img = document.createElement('img');
+    const url = URL.createObjectURL(file);
+    try {
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error(`Could not read "${file.name}" as an image`));
+        img.src = url;
+      });
+      const scale = Math.min(1, maxWidth / img.naturalWidth);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+      if (!blob) throw new Error(`Could not re-encode "${file.name}"`);
+      return new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  photosInput.addEventListener('change', async () => {
+    previews.innerHTML = '';
+    resizedFiles = [];
+
+    const files = Array.from(photosInput.files).slice(0, MAX_PHOTOS);
+    if (photosInput.files.length > MAX_PHOTOS) {
+      statusEl.textContent = `Only the first ${MAX_PHOTOS} photos will be used.`;
+      statusEl.className = 'error';
+    } else {
+      statusEl.textContent = '';
+      statusEl.className = '';
+    }
+
+    for (const file of files) {
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      previews.appendChild(thumb);
+      try {
+        const resized = await resizeImage(file);
+        resizedFiles.push(resized);
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(resized);
+        thumb.appendChild(img);
+      } catch (err) {
+        thumb.classList.add('error');
+        thumb.textContent = err.message;
+      }
+    }
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    statusEl.textContent = '';
+    statusEl.className = '';
+
+    if (resizedFiles.length === 0) {
+      statusEl.textContent = 'Please choose at least one photo that loaded successfully above.';
+      statusEl.className = 'error';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    statusEl.textContent = 'Submitting…';
+
+    try {
+      const fd = new FormData();
+      fd.append('passphrase', document.getElementById('passphrase').value);
+      fd.append('project-title', document.getElementById('project-title').value);
+      fd.append('location', document.getElementById('location').value);
+      fd.append('scope', document.getElementById('scope').value);
+      fd.append('size', document.getElementById('size').value);
+      fd.append('materials', document.getElementById('materials').value);
+      fd.append('duration', document.getElementById('duration').value);
+      fd.append('description', document.getElementById('description').value);
+      form.querySelectorAll('input[name="tags"]:checked').forEach((cb) => fd.append('tags', cb.value));
+      fd.append('tags-other', document.getElementById('tags-other').value);
+      resizedFiles.forEach((file) => fd.append('photos', file));
+
+      const res = await fetch(WORKER_URL, { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || `Submission failed (${res.status})`);
+      }
+
+      statusEl.textContent = `Submitted — the site will update in a minute or two. (Record: ${data.issueUrl})`;
+      statusEl.className = 'success';
+      form.reset();
+      previews.innerHTML = '';
+      resizedFiles = [];
+    } catch (err) {
+      statusEl.textContent = err.message;
+      statusEl.className = 'error';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,6 +6,7 @@ import { parseIssueBody, parseCheckedTags, parseFreeTags, extractImageUrls, look
 import { fetchImage } from './lib/fetch-image.js';
 import { resizeForWeb } from './lib/resize-image.js';
 import { slugify, uniqueSlug } from './lib/slug.js';
+import { stagingPathFromUrl } from './lib/staging-path.js';
 import { renderProjectSheetHtml, renderPdf } from './render-project-sheet.js';
 import { generateGalleryHtml } from './generate-gallery.js';
 
@@ -65,6 +66,12 @@ async function main() {
     const filename = `photo-${i + 1}.jpg`;
     const absPath = path.join(photosDir, filename);
     await writeFile(absPath, buffer);
+
+    const stagingPath = stagingPathFromUrl(photoUrls[i], REPO);
+    if (stagingPath) {
+      await rm(path.join(ROOT, stagingPath), { force: true });
+    }
+
     photoAbsPaths.push(absPath);
     photoRelPaths.push(`photos/projects/${slug}/${filename}`);
   }
