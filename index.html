@@ -156,36 +156,7 @@
       <h2 class="h-serif" style="font-size: 36px; font-weight: 500; margin: 0; font-style: italic;">Recent projects</h2>
       <a href="gallery.html" style="font-size: 14px; font-weight: 500; border-bottom: 1px solid oklch(50% 0.14 40);">View full gallery &rarr;</a>
     </div>
-    <div style="display:grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 260px 260px; gap: 20px;">
-
-      <div class="gwrap" style="position:relative; overflow:hidden; border-radius: 10px; grid-column: 1; grid-row: 1 / span 2;">
-        <img src="assets/home/gallery-4.jpg" alt="Black cladding shed exterior" style="width:100%; height:100%; object-fit:cover; display:block;">
-        <div class="gcap" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent 50%, oklch(15% 0.008 75 / .88)); display:flex; align-items:flex-end; padding: 28px;">
-          <span style="font-size:19px; color: oklch(96% 0.005 80);">Black cladding finish</span>
-        </div>
-      </div>
-
-      <div class="gwrap" style="position:relative; overflow:hidden; border-radius: 10px; grid-column: 2; grid-row: 1;">
-        <img src="assets/home/gallery-1.jpg" alt="Steel-frame shed with twin roller doors" style="width:100%; height:100%; object-fit:cover; display:block;">
-        <div class="gcap" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent 45%, oklch(15% 0.008 75 / .88)); display:flex; align-items:flex-end; padding: 20px;">
-          <span style="font-size:15px; color: oklch(96% 0.005 80);">Twin-bay shed build</span>
-        </div>
-
-
-      <div class="gwrap" style="position:relative; overflow:hidden; border-radius: 10px; grid-column: 3; grid-row: 1;">
-        <img src="assets/home/gallery-2.jpg" alt="Large shed with roller door" style="width:100%; height:100%; object-fit:cover; display:block;">
-        <div class="gcap" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent 45%, oklch(15% 0.008 75 / .88)); display:flex; align-items:flex-end; padding: 20px;">
-          <span style="font-size:15px; color: oklch(96% 0.005 80);">Full workshop shed</span>
-        </div>
-      </div>
-
-      <div class="gwrap" style="position:relative; overflow:hidden; border-radius: 10px; grid-column: 2 / span 2; grid-row: 2;">
-        <img src="assets/home/gallery-3.jpg" alt="Shed interior steel frame" style="width:100%; height:100%; object-fit:cover; display:block;">
-        <div class="gcap" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent 50%, oklch(15% 0.008 75 / .88)); display:flex; align-items:flex-end; padding: 24px;">
-          <span style="font-size:17px; color: oklch(96% 0.005 80);">Engineered interior frame</span>
-        </div>
-      </div>
-
+    <div id="recent-projects-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 260px 260px; gap: 20px;">
     </div>
   </div>
 
@@ -275,6 +246,39 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
+
+  const RECENT_SLOT_STYLE = [
+    { column: '1', row: '1 / span 2', gradientStop: '50%', padding: '28px', fontSize: '19px' },
+    { column: '2', row: '1', gradientStop: '45%', padding: '20px', fontSize: '15px' },
+    { column: '3', row: '1', gradientStop: '45%', padding: '20px', fontSize: '15px' },
+    { column: '2 / span 2', row: '2', gradientStop: '50%', padding: '24px', fontSize: '17px' },
+  ];
+
+  fetch('data/recent-projects.json')
+    .then((r) => r.json())
+    .then((slots) => {
+      const grid = document.getElementById('recent-projects-grid');
+      if (!grid) return;
+      grid.innerHTML = RECENT_SLOT_STYLE
+        .map((style, i) => {
+          const slot = slots[i];
+          if (!slot) {
+            return `
+        <div style="position:relative; overflow:hidden; border-radius: 10px; grid-column: ${style.column}; grid-row: ${style.row}; background: oklch(92% 0.005 75); border: 1px dashed oklch(80% 0.005 75); display:flex; align-items:center; justify-content:center;">
+          <span style="font-size:13px; color: oklch(55% 0.005 75);">No photo yet</span>
+        </div>`;
+          }
+          return `
+        <div class="gwrap" style="position:relative; overflow:hidden; border-radius: 10px; grid-column: ${style.column}; grid-row: ${style.row};">
+          <img src="${escapeHtml(slot.src)}" alt="${escapeHtml(slot.alt || '')}" style="width:100%; height:100%; object-fit:cover; display:block;">
+          <div class="gcap" style="position:absolute; inset:0; background: linear-gradient(180deg, transparent ${style.gradientStop}, oklch(15% 0.008 75 / .88)); display:flex; align-items:flex-end; padding: ${style.padding};">
+            <span style="font-size:${style.fontSize}; color: oklch(96% 0.005 80);">${escapeHtml(slot.caption || '')}</span>
+          </div>
+        </div>`;
+        })
+        .join('');
+    })
+    .catch(() => {});
 
   fetch('data/projects.json')
     .then((r) => r.json())
