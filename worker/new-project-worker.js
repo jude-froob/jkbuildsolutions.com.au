@@ -92,8 +92,21 @@ export function buildIssueBody({ fields, checkedTags, tagsOther, photoUrls }) {
 async function handlePost(request, env) {
   const formData = await request.formData();
 
-  if (formData.get('passphrase') !== env.FORM_PASSPHRASE) {
-    return json(401, { ok: false, error: 'Incorrect passphrase' });
+  const receivedPassphrase = (formData.get('passphrase') || '').toString();
+  const expectedPassphrase = (env.FORM_PASSPHRASE || '').toString();
+  if (receivedPassphrase !== expectedPassphrase) {
+    // TEMPORARY DEBUG — remove once the mismatch is diagnosed. Reveals only
+    // lengths and whether trimming would fix it, never the actual values.
+    return json(401, {
+      ok: false,
+      error: 'Incorrect passphrase',
+      debug: {
+        receivedLength: receivedPassphrase.length,
+        expectedLength: expectedPassphrase.length,
+        expectedIsSet: expectedPassphrase.length > 0,
+        trimmedWouldMatch: receivedPassphrase.trim() === expectedPassphrase.trim(),
+      },
+    });
   }
 
   const fields = {};
