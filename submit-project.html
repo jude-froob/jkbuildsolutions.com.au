@@ -244,7 +244,8 @@
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || `Submission failed (${res.status})`);
+        const debugSuffix = data.debug ? ` [debug: ${JSON.stringify(data.debug)}]` : '';
+        throw new Error((data.error || `Submission failed (${res.status})`) + debugSuffix);
       }
 
       statusEl.textContent = `Submitted — the site will update in a minute or two. (Record: ${data.issueUrl})`;
