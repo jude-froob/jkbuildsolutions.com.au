@@ -8,7 +8,6 @@ import { resizeForWeb } from './lib/resize-image.js';
 import { slugify, uniqueSlug } from './lib/slug.js';
 import { stagingPathFromUrl } from './lib/staging-path.js';
 import { renderProjectSheetHtml, renderPdf } from './render-project-sheet.js';
-import { generateGalleryHtml } from './generate-gallery.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -102,9 +101,6 @@ async function main() {
 
   projects.push(record);
   await writeFile(path.join(ROOT, 'data', 'projects.json'), JSON.stringify(projects, null, 2) + '\n');
-
-  const galleryHtml = await generateGalleryHtml(projects);
-  await writeFile(path.join(ROOT, 'projects.html'), galleryHtml);
 
   const githubOutput = process.env.GITHUB_OUTPUT;
   if (githubOutput) {

@@ -6,7 +6,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { renderProjectSheetHtml, renderPdf } from './render-project-sheet.js';
-import { generateGalleryHtml } from './generate-gallery.js';
 import { uniqueSlug, slugify } from './lib/slug.js';
 import { resizeForWeb } from './lib/resize-image.js';
 
@@ -60,11 +59,6 @@ async function main() {
   await mkdir(path.dirname(pdfAbsPath), { recursive: true });
   await renderPdf(sheetHtml, pdfAbsPath);
   console.log('Wrote PDF to', pdfAbsPath);
-
-  const projects = [record];
-  const galleryHtml = await generateGalleryHtml(projects);
-  await writeFile(path.join(ROOT, 'projects.html'), galleryHtml);
-  console.log('Wrote projects.html');
 }
 
 main().catch((err) => {
