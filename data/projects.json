@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "slug": "shed-trial-3",
+    "title": "Shed Trial #3",
+    "location": "Woop Woop",
+    "scope": "She Shed",
+    "size": "12m x 4m",
+    "materials": "colourbond pink",
+    "duration": "10 weeks",
+    "description": "<img width=\"4080\" height=\"3060\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6e3568f6-8686-4510-8e38-dfdcd2400417\" />",
+    "tags": [],
+    "photos": [
+      "photos/projects/shed-trial-3/photo-1.jpg"
+    ],
+    "pdf": "project-sheets/shed-trial-3.pdf",
+    "issueNumber": 4,
+    "submittedAt": "2026-09-05T05:41:05.951Z"
+  }
+]
