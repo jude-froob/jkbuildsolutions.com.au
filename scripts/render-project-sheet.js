@@ -65,7 +65,12 @@ export async function renderProjectSheetHtml(project, { logoPath }) {
   return html;
 }
 
-export async function renderPdf(html, outputPath, { launch } = {}) {
+// Renders the PDF and, if previewPath is given, a JPEG screenshot of the
+// same rendered page in the same browser session — since the sheet is a
+// single viewport-sized page, this is a pixel-accurate "cover image" of the
+// PDF for near-zero extra cost, used for the larger preview + tile thumbnail
+// on the homepage rather than the raw first uploaded photo.
+export async function renderPdf(html, outputPath, { launch, previewPath } = {}) {
   const puppeteer = (await import('puppeteer')).default;
   const { writeFile, mkdtemp, rm } = await import('node:fs/promises');
   const os = await import('node:os');
@@ -88,6 +93,9 @@ export async function renderPdf(html, outputPath, { launch } = {}) {
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
     });
+    if (previewPath) {
+      await page.screenshot({ path: previewPath, type: 'jpeg', quality: 85 });
+    }
   } finally {
     await browser.close();
     await rm(tmpDir, { recursive: true, force: true });

@@ -21,8 +21,19 @@
   .gwrap:hover .gcap { opacity: 1; }
   .gwrap:hover img { transform: scale(1.04); }
   .gwrap img { transition: transform .4s ease; }
-  .doc-card { display:block; color: inherit; text-decoration:none; transition: transform .2s ease, box-shadow .2s ease; }
+  .doc-card { display:block; color: inherit; text-decoration:none; cursor:pointer; transition: transform .2s ease, box-shadow .2s ease; }
   .doc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px oklch(15% 0.01 75 / .16); border-color: oklch(50% 0.14 40) !important; }
+  #pdf-lightbox { position:fixed; inset:0; background: oklch(15% 0.008 75 / .92); z-index:100; display:none; align-items:center; justify-content:center; padding: 40px; flex-direction:column; gap:20px; }
+  #pdf-lightbox.open { display:flex; }
+  #pdf-lightbox img { max-width: 100%; max-height: 72vh; border-radius: 4px; display:block; box-shadow: 0 20px 60px oklch(0% 0 0 / .4); }
+  .lb-btn { position:absolute; background: oklch(15% 0.008 75 / .55); border:none; color: oklch(98% 0 0); cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  #pdf-lb-close { top:24px; right:24px; width:44px; height:44px; }
+  #pdf-lb-prev, #pdf-lb-next { top:50%; transform: translateY(-50%); width:52px; height:52px; }
+  #pdf-lb-prev { left:16px; }
+  #pdf-lb-next { right:16px; }
+  #pdf-lb-download { display:inline-flex; align-items:center; gap:10px; background: oklch(50% 0.14 40); color: oklch(98% 0 0); font-weight:600; font-size:14px; padding: 12px 24px; border-radius: 3px; }
+  #pdf-lb-download:hover { background: oklch(58% 0.14 40); color: oklch(98% 0 0); }
+  #pdf-lb-title { color: oklch(93% 0.01 80); font-size:15px; font-weight:600; text-align:center; }
 </style>
 </head>
 <body>
@@ -238,6 +249,25 @@
 
 </div>
 
+<!-- PROJECT SHEET LIGHTBOX -->
+<div id="pdf-lightbox">
+  <button id="pdf-lb-close" class="lb-btn" aria-label="Close">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg>
+  </button>
+  <button id="pdf-lb-prev" class="lb-btn" aria-label="Previous">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <img id="pdf-lb-img" src="" alt="">
+  <button id="pdf-lb-next" class="lb-btn" aria-label="Next">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <div id="pdf-lb-title"></div>
+  <a id="pdf-lb-download" href="" download>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+    Download PDF
+  </a>
+</div>
+
 <script>
   function escapeHtml(str) {
     return String(str)
@@ -280,33 +310,71 @@
     })
     .catch(() => {});
 
+  let sheetProjects = [];
+  let sheetCurrent = 0;
+
+  function showSheet(i) {
+    sheetCurrent = i;
+    const p = sheetProjects[sheetCurrent];
+    document.getElementById('pdf-lb-img').src = p.preview || p.photos[0] || '';
+    document.getElementById('pdf-lb-img').alt = p.title;
+    document.getElementById('pdf-lb-title').textContent = p.title;
+    document.getElementById('pdf-lb-download').href = p.pdf;
+  }
+  function openSheetLightbox(i) {
+    showSheet(i);
+    document.getElementById('pdf-lightbox').classList.add('open');
+  }
+  function closeSheetLightbox() {
+    document.getElementById('pdf-lightbox').classList.remove('open');
+  }
+  function stepSheet(delta) {
+    showSheet((sheetCurrent + delta + sheetProjects.length) % sheetProjects.length);
+  }
+
+  document.getElementById('pdf-lb-close').addEventListener('click', closeSheetLightbox);
+  document.getElementById('pdf-lb-prev').addEventListener('click', () => stepSheet(-1));
+  document.getElementById('pdf-lb-next').addEventListener('click', () => stepSheet(1));
+  document.getElementById('pdf-lightbox').addEventListener('click', (e) => {
+    if (e.target.id === 'pdf-lightbox') closeSheetLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('pdf-lightbox').classList.contains('open')) return;
+    if (e.key === 'Escape') closeSheetLightbox();
+    if (e.key === 'ArrowLeft') stepSheet(-1);
+    if (e.key === 'ArrowRight') stepSheet(1);
+  });
+
   fetch('data/projects.json')
     .then((r) => r.json())
     .then((projects) => {
       const grid = document.getElementById('project-details-grid');
       if (!grid || !projects.length) return;
-      const sorted = [...projects].sort(
+      sheetProjects = [...projects].sort(
         (a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)
       );
-      grid.innerHTML = sorted
+      grid.innerHTML = sheetProjects
         .map(
-          (p) => `
-        <a class="doc-card" href="${escapeHtml(p.pdf)}" style="background: oklch(100% 0 0); border: 1px solid oklch(88% 0.005 75); border-radius: 8px; overflow:hidden;">
+          (p, i) => `
+        <div class="doc-card" data-index="${i}" style="background: oklch(100% 0 0); border: 1px solid oklch(88% 0.005 75); border-radius: 8px; overflow:hidden;">
           <div style="position:relative;">
             <div style="background: oklch(15% 0.008 75); padding: 10px 14px; display:flex; align-items:center; justify-content:space-between;">
               <img src="Logo/logo-white-no-bg.png" alt="" style="height: 14px; width:auto; opacity:.85;">
               <span style="font-size: 9px; letter-spacing: .1em; color: oklch(65% 0.01 75);">PROJECT SHEET</span>
             </div>
-            <img src="${escapeHtml(p.photos[0] || '')}" alt="${escapeHtml(p.title)}" style="width:100%; height: 150px; object-fit:cover; display:block;">
+            <img src="${escapeHtml(p.preview || p.photos[0] || '')}" alt="${escapeHtml(p.title)}" style="width:100%; height: 150px; object-fit:cover; display:block;">
             <span style="position:absolute; top:44px; right:12px; background: oklch(50% 0.14 40); color: oklch(98% 0 0); font-size: 10px; font-weight:700; letter-spacing:.04em; padding: 4px 8px; border-radius: 3px;">PDF</span>
           </div>
           <div style="padding: 14px 16px; border-top: 1px solid oklch(92% 0.005 75); display:flex; align-items:center; justify-content:space-between;">
             <span style="font-size: 14px; font-weight: 600; color: oklch(18% 0.005 75);">${escapeHtml(p.title)}</span>
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="oklch(50% 0.14 40)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
           </div>
-        </a>`
+        </div>`
         )
         .join('');
+      grid.querySelectorAll('.doc-card').forEach((card) => {
+        card.addEventListener('click', () => openSheetLightbox(Number(card.dataset.index)));
+      });
     })
     .catch(() => {});
 </script>
