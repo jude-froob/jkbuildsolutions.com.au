@@ -31,16 +31,30 @@ Partner/supplier logos (Stratco, ACS Engineers, and others) — likely for a
 
 ## Publishing a new project (photo + PDF sheet)
 
-Open a "New completed project" issue (Issues → New issue → pick that template),
-fill in the fields, and drag your project photos into the Project Photos box.
-A GitHub Action (`.github/workflows/new-project.yml`) resizes the photos,
-generates a PDF project sheet, and commits everything plus an updated
-`projects.html` straight to `main`. Only issues opened by the repo owner
-trigger it. See `scripts/` for the automation itself.
+Either way below ends up in the same place: a GitHub Action
+(`.github/workflows/new-project.yml`) resizes the photos, generates a PDF
+project sheet, and commits everything plus an updated `projects.html`
+straight to `main`. See `scripts/` for the automation itself.
 
-One-time setup required before this works: repo Settings → Actions → General
-→ Workflow permissions → "Read and write permissions" (needed so the
-workflow's token can push to `main` and comment/close the issue).
+**Webpage form (day-to-day way):** open `submit-project.html` on the live
+site, enter the access passphrase, fill in the fields, and pick photo files.
+The page resizes them in your browser, then a Cloudflare Worker
+(`worker/new-project-worker.js`) stages them into the repo and opens the
+underlying GitHub issue on your behalf — you never see GitHub's UI.
+
+**GitHub issue (fallback way):** Issues → New issue → "New completed
+project" template, fill in the fields, drag photos into the Project Photos
+box. Only issues opened by the repo owner trigger the automation.
+
+One-time setup required before either works:
+- Repo Settings → Actions → General → Workflow permissions → "Read and write
+  permissions" (needed so the workflow's token can push to `main` and
+  comment/close the issue).
+- For the webpage form specifically: a fine-grained GitHub PAT (scoped to
+  just this repo, Contents + Issues read/write) and a deployed Cloudflare
+  Worker using `worker/new-project-worker.js`, with `GITHUB_TOKEN` and
+  `FORM_PASSPHRASE` set as Worker secrets, and the Worker's `*.workers.dev`
+  URL pasted into `submit-project.html`'s `WORKER_URL` constant.
 
 ## Open items
 - Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
