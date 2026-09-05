@@ -1,9 +1,8 @@
 # JK Build Solutions — Brand Guidelines
 
-Version 1.0 — September 2026. Derived from the live site's own copy and logo
-(see `../content-inventory/`) and the real project photos (`../photos/`), not
-invented from scratch. This is the reference for the site rebuild — colors,
-type, and voice should trace back to this file.
+Version 1.1 — September 2026. Matched to the live site build (`index.html`,
+`projects.html`, `submit-project.html` on `main`) — colors, fonts, and logo
+assets below are the real values shipped in the code, not proposals.
 
 A fully designed version of this document, with the logo, color swatches, and
 a photography mood board, is published as an Artifact:
@@ -11,16 +10,16 @@ https://claude.ai/code/artifact/4b46c5cf-1e5e-4135-a350-0c12176595af
 
 ## Positioning
 
-JK Build Solutions is a QBCC-licensed builder in Queensland's Scenic Rim,
-Logan and South Brisbane corridor, run on decades of hands-on tradesmanship
-rather than a sales floor. The pitch is the process: design, council
-approval, engineering and construction handled end to end by the person
-doing the work — done right the first time, with plain, honest advice along
-the way.
+"**Honest building. Exceptional finish.**" — JK Build Solutions is a
+QBCC-licensed builder across the Scenic Rim and Gold Coast, run on decades of
+hands-on tradesmanship rather than a sales floor. Design, engineering,
+council approval and construction are handled end to end by the person doing
+the work — done right the first time, with plain, honest advice along the
+way.
 
-- **What**: Custom builds & sheds — concept through council approval,
-  engineering and completion
-- **Where**: Scenic Rim, Logan & South Brisbane, QLD
+- **What**: Sheds & garages, Queenslander homes, granny flats, rock walls,
+  decks
+- **Where**: Scenic Rim & Gold Coast, QLD
 - **Who**: Owner-operator James, QBCC 15475385 — one builder, one point of
   contact
 
@@ -31,89 +30,102 @@ the way.
 2. **Honest, not salesy** — clear, practical advice; clients understand what
    they're getting and why.
 3. **Function with form** — practical solutions that still look considered.
-4. **One builder, full lifecycle** — design, council approval, engineering,
+4. **One builder, full lifecycle** — design, engineering, council approval,
    construction as one relationship, not a handoff chain.
 
 | Situation | Say it like this | Not like this |
 |---|---|---|
-| Describing the offer | Name the actual process: design → approval → engineering → build | "Full-service solutions" with no specifics |
+| Describing the offer | Name the actual process: design → engineering → council approval → build | "Full-service solutions" with no specifics |
 | Making a claim | Back it with the trade detail (QBCC number, decades on tools, real project photos) | Superlatives with nothing behind them |
 | Tone | Calm, direct, tradesperson-to-client | Exclamation marks, forced enthusiasm |
 | Showing work | The finished shed or frame, in its actual paddock | Stock photography or renders |
+| Contact | "No forms, no waiting — phone or message us directly" | A contact form nobody fills in |
 
 **Use**: craftsmanship, clear & honest advice, council approval, engineering,
-attention to detail, your investment.
+attention to detail, done right the first time.
 **Skip**: industry-leading, turnkey solutions, world-class, synergy.
 
 ## Logo
 
-Primary lockup: `../content-inventory/images/logo-full.png`. Black wordmark
-("J K Build Solutions") with a single-line roofline mark above it.
+Real, shipped assets in `Logo/`:
+
+| File | Role |
+|---|---|
+| `Logo/logo-black-no-bg.png` | Ink mark on transparent — light backgrounds |
+| `Logo/logo-white-no-bg.png` | Reversed mark on transparent — dark backgrounds |
+| `Logo/logo-color-with-bg.png` | Reversed mark baked onto an Ink card — one flat file for email signatures, partner decks |
+| `Logo/favicon/favicon-browser.png`, `favicon-iphone.png`, `favicon-android.png` | Favicons, already exported |
 
 - **Clearspace**: the width of the roofline mark, on every side, minimum.
 - **Minimum size**: 120px / 30mm wide for the full lockup; drop to the
-  roofline mark alone below that (favicon, social avatar).
-- **Colors**: runs in Ink (`#1C1B19`) or reversed in Paper (`#F0F0EB`) only.
-  No other recolor exists today — a true reversed (paper-on-monument) file
-  should be produced before the mark is used on a dark background; do not
-  fake it with a CSS filter in production.
+  roofline mark alone below that.
 - **Don't**: stretch or skew off native proportions; add a drop shadow,
-  outline, or container shape; place directly on a busy photo without a
-  solid card or scrim behind it.
+  outline, or container shape; fake a reversed version with a CSS filter
+  when the real exported file exists.
 
 ## Color
 
-One accent carries the brand; everything else is structure or a
-photography tie-in — not a rack of equal-weight brand colors.
+The live site writes every color as `oklch()` directly in its CSS — these
+are the actual values, not hex approximations. One accent (Rust) carries the
+brand; everything else is structure.
 
-| Name | Hex | Role |
-|---|---|---|
-| Ink | `#1C1B19` | Logo, headings, body text |
-| Paper | `#F0F0EB` | Page background, reversed logo |
-| Monument | `#2B2C29` | Dark cladding tone — footers, dark sections |
-| Steel | `#9B9D97` | Galvanised frame grey — rules, dividers, disabled states |
-| Gum Leaf (accent) | `#4F5C3A` | The one accent — links, CTAs, active states |
-| Sky Haze *(reference only)* | `#7C9FB8` | QLD sky in project photos |
-| Clay *(reference only)* | `#B98A54` | Site dirt, brick edging, timber frame |
+| Name | oklch() | Hex | Role |
+|---|---|---|---|
+| Ink | `oklch(15% 0.008 75)` | `#0D0B08` | Nav, footer, dark surfaces, body text |
+| Paper | `oklch(97% 0.006 80)` | `#F7F5F1` | Page background, reversed logo & text on Ink |
+| Paper Alt | `oklch(94% 0.005 75)` | `#EDEBE7` | Section bands — About, alternating panels |
+| Line | `oklch(88% 0.005 75)` | `#D9D7D4` | Card borders, hairlines |
+| Ink Soft | `oklch(45% 0.005 75)` | `#575552` | Muted body copy, captions |
+| Rust (accent) | `oklch(50% 0.14 40)` | `#A24019` | Links, icon strokes, step numbers |
+| Rust Strong | `oklch(62% 0.15 40)` | `#CF6139` | Primary CTA fill, contact band background |
+| Rust Hover *(state, not a swatch)* | `oklch(68% 0.15 40)` | `#E4744B` | Hover on Rust Strong |
 
-Dark-mode tokens (for the site rebuild): swap Ink/Paper roles — background
-`#181715`, text `#F0F0EB`, accent lightened to `#9FB37E` for contrast.
+Nothing else on the site carries color — sheds, sky and timber stay in the
+photography, not the palette.
 
 ## Typography
 
-- **Display / headings**: Fraunces (500–600 weight), 40–68px for display,
-  26–34px for section headings. Echoes the logo's serif.
-- **Eyebrow / label**: Jost, uppercase, 11–13px, 0.14–0.18em tracking —
-  echoes the "SOLUTIONS" treatment under the logo mark.
-- **Body**: Inter, 400 weight, 16–17px / 1.65 line-height, ≤62 characters
-  per line.
-- **Caption / meta**: Inter, 500 weight, 12–13px, Ink Soft color.
+- **Display / headings**: Newsreader, 500 weight, **always italic** —
+  40–62px for display, 26–34px for section headings. Step numbers and stat
+  figures also use italic Newsreader, set in Rust.
+- **Nav / label / eyebrow**: Work Sans, 600 weight, uppercase, 0.04–0.12em
+  tracking. No separate label typeface — tracking does the work.
+- **Body**: Work Sans, 400 weight, 15–18px / 1.6–1.75 line-height, ≤62
+  characters per line.
+- **Caption / meta**: Work Sans, 500 weight, 12–13px, Ink Soft color.
 
-Google Fonts: `Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700`,
-`Jost:wght@400;500;600`, `Inter:wght@400;500;600`.
+Google Fonts: `Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500`,
+`Work+Sans:wght@400;500;600;700`.
+
+**Shape**: 2px radius on buttons/pills/tags, 3px on cards and panels, 10px
+only on photographic gallery tiles — sharp and near-square, not softly
+rounded.
 
 ## Photography
 
 - Real completed and in-progress projects only — never stock photography or
   renders.
 - Natural daylight, un-staged — overcast, rain and sun all read as "this
-  actually happened" (see `../photos/shed-exterior-black-windows.jpg`).
-- Let Monument cladding hold its value in the frame — don't crush blacks or
-  blow out the sky.
-- Mix wide paddock/site establishing shots with close material and detail
-  shots in the same gallery.
+  actually happened."
+- Let Ink cladding hold its value in the frame — don't crush blacks or blow
+  out the sky.
+- Gallery hover reveals a one-line caption over a dark gradient — keep
+  captions short.
 
 ## Applications
 
-Standard sign-off block — appears the same way everywhere the brand does
-(site footer, quotes, invoices). Service area and licence number always
-appear together, never the licence number alone:
+Two components carry the brand everywhere it appears on the live site:
 
+**Footer bar** (Ink background, reversed logo, muted copyright line):
 ```
-Building and construction in the Scenic Rim, Logan and South Brisbane
-QBCC: 15475385
-James@JKBuildSolutions.com.au · All rights reserved © JKBuildSolutions
+[reversed logo]     © 2026 JK Build Solutions · QBCC 15475385 · Scenic Rim & Gold Coast
 ```
 
-Update the copyright year on each annual review — the live site currently
-carries a stale 2024 date that should move to the current year at rebuild.
+**Contact band** (Rust Strong background, dark text, Ink pill buttons):
+```
+Let's talk about your build.          [04 516 74 855] [Email] [Facebook]
+```
+
+No contact form on the site — phone, email and Facebook are the only paths
+in, always shown together. Update the footer's copyright year on each
+annual review.
