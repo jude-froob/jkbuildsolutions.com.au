@@ -72,19 +72,25 @@ the site — same passphrase-gated, Worker-relayed pattern as
   have its caption edited, or be deleted (the slot shows "No photo yet" on
   the homepage until a new photo is uploaded).
 
-**This page reuses the existing Worker** (`worker/new-project-worker.js`) —
-it now branches on a `action` field (`gallery-add` / `recent-update` /
-default `new-project`) instead of needing a second Worker. Because the
-Worker isn't connected to git, redeploy it after pulling these changes:
+**This page has its own dedicated Worker**, `worker/photo-upload-worker.js`
+(deployed separately from `jk-new-pdf-project-form`, which stays exactly as
+it was — untouched by this feature). One-time setup for a fresh Cloudflare
+Worker:
 
-1. Cloudflare dashboard → Compute (Workers & Pages) → the existing
-   `jk-new-pdf-project-form` Worker → **Edit code** (Quick Edit).
-2. Select all, delete, paste in the full contents of
-   `worker/new-project-worker.js` from this repo.
-3. Click **Save and deploy**.
-
-No new secrets are needed — it reuses the Worker's existing `GITHUB_TOKEN`
-and `FORM_PASSPHRASE`.
+1. Cloudflare dashboard → Compute (Workers & Pages) → **Create** → **Workers**
+   → **Create Worker**. Name it `jk-new-photo-upload-form`, then **Deploy**
+   (the default "Hello World" template is fine as a starting point).
+2. Once created, open it → **Edit code** (Quick Edit). Select all, delete,
+   paste in the full contents of `worker/photo-upload-worker.js` from this
+   repo, then **Save and deploy**.
+3. Back on the Worker's page → **Settings** → **Variables and Secrets** →
+   add two secrets: `GITHUB_TOKEN` (the same fine-grained PAT value used by
+   `jk-new-pdf-project-form`) and `FORM_PASSPHRASE` (can reuse the same
+   passphrase, or set a different one). Save.
+4. Copy the Worker's `*.workers.dev` URL (shown on its dashboard page) and
+   confirm it matches `manage-photos.html`'s `WORKER_URL` constant — it's
+   already set to `https://jk-new-photo-upload-form.judith-kelmanson.workers.dev/`
+   in this repo, so this only matters if you rename the Worker.
 
 ## Open items
 - Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
