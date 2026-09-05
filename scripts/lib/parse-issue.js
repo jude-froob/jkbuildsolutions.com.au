@@ -41,3 +41,13 @@ export function extractImageUrls(photosValue) {
   const htmlUrls = [...photosValue.matchAll(/<img\b[^>]*\bsrc="(https?:\/\/[^"]+)"/gi)].map((m) => m[1]);
   return [...markdownUrls, ...htmlUrls];
 }
+
+// A dropped photo lands wherever the cursor was focused, and the Description
+// box (a textarea, like Project Photos) accepts drag-and-drop the same way —
+// so a photo meant for "Project Photos" can end up here by mistake, ending
+// up as raw markup on the published sheet instead of the description text.
+// Same two forms as extractImageUrls, checked as a presence test.
+export function looksLikeImageMarkup(value) {
+  if (!value) return false;
+  return /!\[[^\]]*\]\(https?:\/\//.test(value) || /<img\b[^>]*\bsrc="https?:\/\//i.test(value);
+}
