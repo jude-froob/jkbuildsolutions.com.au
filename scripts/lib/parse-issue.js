@@ -29,10 +29,15 @@ export function parseFreeTags(tagsOtherValue) {
 }
 
 // Scoped to a single field's value (the "Project Photos" textarea), not the
-// whole issue body. Matches both github.com/user-attachments/... and legacy
+// whole issue body. GitHub inserts a dropped image as either markdown
+// (`![alt](url)`) or an HTML <img ... src="url"> tag (observed in practice
+// for larger images), so both forms are matched. Covers both
+// github.com/user-attachments/... and legacy
 // user-images.githubusercontent.com/... URLs, since both appear as plain
-// https:// URLs inside standard markdown image syntax.
+// https:// URLs in either form.
 export function extractImageUrls(photosValue) {
   if (!photosValue) return [];
-  return [...photosValue.matchAll(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/g)].map((m) => m[1]);
+  const markdownUrls = [...photosValue.matchAll(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/g)].map((m) => m[1]);
+  const htmlUrls = [...photosValue.matchAll(/<img\b[^>]*\bsrc="(https?:\/\/[^"]+)"/gi)].map((m) => m[1]);
+  return [...markdownUrls, ...htmlUrls];
 }
