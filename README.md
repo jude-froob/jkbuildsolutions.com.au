@@ -13,8 +13,16 @@ reference while rebuilding:
 - `home.md`, `contact.md` — page copy
 - `images/` — logo and hero photo pulled from the live site
 
+## photos/
+
+Real project photos (shed builds) to use as the site's actual gallery/hero
+content — a big upgrade over the one stock-ish hero image on the live site.
+This folder is a live working set; more photos will be added over time.
+
 ## Open items
-- Confirm who controls DNS for jkbuildsolutions.com.au for the eventual cutover
+- Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
+- Design direction: rebuilding with the Claude Design skill rather than the
+  old Idea_1 mockup (deemed too plain, removed 2026-09-05)
 
 ## Decisions
 - No contact form — the old one went unused. Contact page will just surface
