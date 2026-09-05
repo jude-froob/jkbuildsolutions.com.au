@@ -29,6 +29,19 @@ without background) plus favicons for browser/iPhone/Android.
 Partner/supplier logos (Stratco, ACS Engineers, and others) — likely for a
 "who we work with" section on the new site.
 
+## Publishing a new project (photo + PDF sheet)
+
+Open a "New completed project" issue (Issues → New issue → pick that template),
+fill in the fields, and drag your project photos into the Project Photos box.
+A GitHub Action (`.github/workflows/new-project.yml`) resizes the photos,
+generates a PDF project sheet, and commits everything plus an updated
+`projects.html` straight to `main`. Only issues opened by the repo owner
+trigger it. See `scripts/` for the automation itself.
+
+One-time setup required before this works: repo Settings → Actions → General
+→ Workflow permissions → "Read and write permissions" (needed so the
+workflow's token can push to `main` and comment/close the issue).
+
 ## Open items
 - Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
 - Design direction: rebuilding with the Claude Design skill rather than the

@@ -1,0 +1,63 @@
+name: Publish new project
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    if: >
+      github.event.issue.author_association == 'OWNER' &&
+      contains(github.event.issue.labels.*.name, 'new-project')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Process issue
+        id: process
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: node scripts/process-issue.js
+
+      - name: Commit and push
+        env:
+          COMMIT_TITLE: ${{ steps.process.outputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add photos/projects data/projects.json project-sheets projects.html
+          git diff --cached --quiet || git commit -m "Add project: $COMMIT_TITLE"
+          git push origin HEAD:main
+
+      - name: Comment success
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+          SLUG: ${{ steps.process.outputs.slug }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Published: https://jude-froob.github.io/jkbuildsolutions.com.au/projects.html#$SLUG"
+          gh issue close "$ISSUE_NUMBER" --repo "$REPO"
+
+      - name: Comment failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Automation failed — see the run log: $RUN_URL"
