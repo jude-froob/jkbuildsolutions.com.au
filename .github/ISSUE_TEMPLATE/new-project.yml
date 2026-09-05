@@ -1,0 +1,86 @@
+name: New completed project
+description: Submit a finished project to publish a project sheet PDF and gallery entry.
+title: "[New Project]: "
+labels: ["new-project"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in the details below. For photos, click into the "Project Photos"
+        box and drag and drop your image files directly into it — GitHub will
+        turn each one into a link automatically. Add as many as you like.
+  - type: input
+    id: project-title
+    attributes:
+      label: Project title
+      placeholder: "Black Cladding Shed"
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      placeholder: "Beaudesert, QLD"
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Scope
+      placeholder: "Shed design & construction"
+    validations:
+      required: true
+  - type: input
+    id: size
+    attributes:
+      label: Size
+      placeholder: "9m x 6m"
+    validations:
+      required: true
+  - type: input
+    id: materials
+    attributes:
+      label: Materials
+      placeholder: "Colorbond® steel, dark finish"
+    validations:
+      required: true
+  - type: input
+    id: duration
+    attributes:
+      label: Duration
+      placeholder: "6 weeks"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: One or two sentences describing the project.
+    validations:
+      required: true
+  - type: checkboxes
+    id: tags
+    attributes:
+      label: Tags
+      options:
+        - label: Council approved
+        - label: Engineered
+        - label: Fully managed
+        - label: Custom design
+  - type: input
+    id: tags-other
+    attributes:
+      label: Additional tags
+      description: Comma-separated, optional.
+      placeholder: "Renovation, Fast turnaround"
+    validations:
+      required: false
+  - type: textarea
+    id: photos
+    attributes:
+      label: Project Photos
+      description: >
+        Click in this box, then drag and drop your photo files here. Do not
+        type anything else — just drop the images and submit.
+    validations:
+      required: true
