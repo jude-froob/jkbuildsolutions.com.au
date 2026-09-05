@@ -19,6 +19,16 @@ Real project photos (shed builds) to use as the site's actual gallery/hero
 content — a big upgrade over the one stock-ish hero image on the live site.
 This folder is a live working set; more photos will be added over time.
 
+## Logo/
+
+New JK Build Solutions logo set: color/black/white variants (with and
+without background) plus favicons for browser/iPhone/Android.
+
+## companies/
+
+Partner/supplier logos (Stratco, ACS Engineers, and others) — likely for a
+"who we work with" section on the new site.
+
 ## Open items
 - Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
 - Design direction: rebuilding with the Claude Design skill rather than the
