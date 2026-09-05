@@ -33,7 +33,10 @@
   #pdf-lb-next { right:16px; }
   #pdf-lb-download { display:inline-flex; align-items:center; gap:10px; background: oklch(50% 0.14 40); color: oklch(98% 0 0); font-weight:600; font-size:14px; padding: 12px 24px; border-radius: 3px; }
   #pdf-lb-download:hover { background: oklch(58% 0.14 40); color: oklch(98% 0 0); }
+  #pdf-lb-share { display:inline-flex; align-items:center; gap:10px; background: transparent; color: oklch(93% 0.01 80); font-weight:600; font-size:14px; padding: 12px 24px; border-radius: 3px; border: 1px solid oklch(45% 0.01 75); cursor:pointer; font-family:inherit; }
+  #pdf-lb-share:hover { border-color: oklch(70% 0.01 80); }
   #pdf-lb-title { color: oklch(93% 0.01 80); font-size:15px; font-weight:600; text-align:center; }
+  #pdf-lb-share-status { color: oklch(75% 0.01 80); font-size:13px; text-align:center; min-height:16px; }
 </style>
 </head>
 <body>
@@ -262,10 +265,17 @@
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
   </button>
   <div id="pdf-lb-title"></div>
-  <a id="pdf-lb-download" href="" download>
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
-    Download PDF
-  </a>
+  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center;">
+    <a id="pdf-lb-download" href="" download>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+      Download PDF
+    </a>
+    <button id="pdf-lb-share" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6l6.8-3.9M8.6 13.4l6.8 3.9"/></svg>
+      Share
+    </button>
+  </div>
+  <div id="pdf-lb-share-status"></div>
 </div>
 
 <script>
@@ -320,6 +330,33 @@
     document.getElementById('pdf-lb-img').alt = p.title;
     document.getElementById('pdf-lb-title').textContent = p.title;
     document.getElementById('pdf-lb-download').href = p.pdf;
+    document.getElementById('pdf-lb-share-status').textContent = '';
+  }
+
+  async function shareCurrentSheet() {
+    const p = sheetProjects[sheetCurrent];
+    const url = new URL(p.pdf, document.baseURI).href;
+    const statusEl = document.getElementById('pdf-lb-share-status');
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: p.title, text: `Project sheet: ${p.title}`, url });
+      } catch (err) {
+        if (err.name !== 'AbortError') statusEl.textContent = 'Could not share — link copied instead.';
+        else return;
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {}
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      statusEl.textContent = 'Link copied to clipboard';
+    } catch {
+      statusEl.textContent = url;
+    }
   }
   function openSheetLightbox(i) {
     showSheet(i);
@@ -333,6 +370,7 @@
   }
 
   document.getElementById('pdf-lb-close').addEventListener('click', closeSheetLightbox);
+  document.getElementById('pdf-lb-share').addEventListener('click', shareCurrentSheet);
   document.getElementById('pdf-lb-prev').addEventListener('click', () => stepSheet(-1));
   document.getElementById('pdf-lb-next').addEventListener('click', () => stepSheet(1));
   document.getElementById('pdf-lightbox').addEventListener('click', (e) => {
