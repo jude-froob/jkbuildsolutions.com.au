@@ -48,6 +48,7 @@ async function main() {
     tags: ['Council approved', 'Engineered', 'Fully managed'],
     photos: photoRelPaths,
     pdf: `project-sheets/${slug}.pdf`,
+    preview: `project-sheets/${slug}-preview.jpg`,
     issueNumber: 1,
     submittedAt: new Date().toISOString(),
   };
@@ -56,9 +57,11 @@ async function main() {
   const sheetHtml = await renderProjectSheetHtml({ ...record, photoAbsPaths }, { logoPath });
 
   const pdfAbsPath = path.join(ROOT, record.pdf);
+  const previewAbsPath = path.join(ROOT, record.preview);
   await mkdir(path.dirname(pdfAbsPath), { recursive: true });
-  await renderPdf(sheetHtml, pdfAbsPath);
+  await renderPdf(sheetHtml, pdfAbsPath, { previewPath: previewAbsPath });
   console.log('Wrote PDF to', pdfAbsPath);
+  console.log('Wrote preview to', previewAbsPath);
 }
 
 main().catch((err) => {

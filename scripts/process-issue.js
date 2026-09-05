@@ -76,6 +76,7 @@ async function main() {
   }
 
   const pdfRelPath = `project-sheets/${slug}.pdf`;
+  const previewRelPath = `project-sheets/${slug}-preview.jpg`;
   const record = {
     slug,
     title: fields['Project title'],
@@ -88,6 +89,7 @@ async function main() {
     tags,
     photos: photoRelPaths,
     pdf: pdfRelPath,
+    preview: previewRelPath,
     issueNumber: Number(ISSUE_NUMBER),
     submittedAt: new Date().toISOString(),
   };
@@ -96,8 +98,9 @@ async function main() {
   const sheetHtml = await renderProjectSheetHtml({ ...record, photoAbsPaths }, { logoPath });
 
   const pdfAbsPath = path.join(ROOT, pdfRelPath);
+  const previewAbsPath = path.join(ROOT, previewRelPath);
   await mkdir(path.dirname(pdfAbsPath), { recursive: true });
-  await renderPdf(sheetHtml, pdfAbsPath);
+  await renderPdf(sheetHtml, pdfAbsPath, { previewPath: previewAbsPath });
 
   projects.push(record);
   await writeFile(path.join(ROOT, 'data', 'projects.json'), JSON.stringify(projects, null, 2) + '\n');
