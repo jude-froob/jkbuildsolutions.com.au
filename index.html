@@ -20,6 +20,8 @@
   .gwrap:hover .gcap { opacity: 1; }
   .gwrap:hover img { transform: scale(1.04); }
   .gwrap img { transition: transform .4s ease; }
+  .doc-card { display:block; color: inherit; text-decoration:none; transition: transform .2s ease, box-shadow .2s ease; }
+  .doc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px oklch(15% 0.01 75 / .16); border-color: oklch(50% 0.14 40) !important; }
 </style>
 </head>
 <body>
@@ -30,8 +32,9 @@
   <div style="background: oklch(15% 0.008 75); display:flex; align-items:center; justify-content:space-between; padding: 16px 64px;">
     <img src="Logo/logo-white-no-bg.png" alt="JK Build Solutions" style="height: 60px; width: auto;">
     <div style="display:flex; align-items:center; gap:26px;">
-      <a class="navlink" href="#services" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">SERVICES</a>
-      <a class="navlink" href="projects.html" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">PROJECTS</a>
+      <a class="navlink" href="#services" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">ABOUT</a>
+      <a class="navlink" href="#projects" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">PROJECTS</a>
+      <a class="navlink" href="projects.html" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">GALLERY</a>
       <a class="navlink" href="#contact" style="color: oklch(80% 0.01 80); font-size: 14px; letter-spacing: .04em;">CONTACT</a>
     </div>
     <a href="tel:0451674855" style="display:flex; align-items:center; gap:8px; color: oklch(93% 0.01 80); font-size: 14px; font-weight: 600; border: 1px solid oklch(35% 0.01 75); padding: 10px 18px; border-radius: 2px;">
@@ -148,7 +151,7 @@
   <div id="projects" style="padding: 108px 64px 108px; max-width: 1280px; margin: 0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 40px; gap: 40px;">
       <h2 class="h-serif" style="font-size: 36px; font-weight: 500; margin: 0; font-style: italic;">Recent projects</h2>
-      <a href="projects.html" style="font-size: 14px; font-weight: 500; border-bottom: 1px solid oklch(50% 0.14 40);">View all projects &amp; PDFs &rarr;</a>
+      <a href="projects.html" style="font-size: 14px; font-weight: 500; border-bottom: 1px solid oklch(50% 0.14 40);">View full gallery &rarr;</a>
     </div>
     <div style="display:grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 260px 260px; gap: 20px;">
 
@@ -180,6 +183,16 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- PROJECT DETAILS -->
+  <div id="project-details" style="padding: 40px 64px 108px; max-width: 1280px; margin: 0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 40px; gap: 40px;">
+      <h2 class="h-serif" style="font-size: 30px; font-weight: 500; margin: 0; font-style: italic;">Project details</h2>
+      <p style="color: oklch(45% 0.005 75); max-width: 380px; margin: 0; font-size: 14px; line-height: 1.6;">Tap a project to open its full spec sheet as a PDF.</p>
+    </div>
+    <div id="project-details-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px;">
     </div>
   </div>
 
@@ -249,5 +262,45 @@
   </div>
 
 </div>
+
+<script>
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  fetch('data/projects.json')
+    .then((r) => r.json())
+    .then((projects) => {
+      const grid = document.getElementById('project-details-grid');
+      if (!grid || !projects.length) return;
+      const sorted = [...projects].sort(
+        (a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)
+      );
+      grid.innerHTML = sorted
+        .map(
+          (p) => `
+        <a class="doc-card" href="${escapeHtml(p.pdf)}" style="background: oklch(100% 0 0); border: 1px solid oklch(88% 0.005 75); border-radius: 8px; overflow:hidden;">
+          <div style="position:relative;">
+            <div style="background: oklch(15% 0.008 75); padding: 10px 14px; display:flex; align-items:center; justify-content:space-between;">
+              <img src="Logo/logo-white-no-bg.png" alt="" style="height: 14px; width:auto; opacity:.85;">
+              <span style="font-size: 9px; letter-spacing: .1em; color: oklch(65% 0.01 75);">PROJECT SHEET</span>
+            </div>
+            <img src="${escapeHtml(p.photos[0] || '')}" alt="${escapeHtml(p.title)}" style="width:100%; height: 150px; object-fit:cover; display:block;">
+            <span style="position:absolute; top:44px; right:12px; background: oklch(50% 0.14 40); color: oklch(98% 0 0); font-size: 10px; font-weight:700; letter-spacing:.04em; padding: 4px 8px; border-radius: 3px;">PDF</span>
+          </div>
+          <div style="padding: 14px 16px; border-top: 1px solid oklch(92% 0.005 75); display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size: 14px; font-weight: 600; color: oklch(18% 0.005 75);">${escapeHtml(p.title)}</span>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="oklch(50% 0.14 40)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+          </div>
+        </a>`
+        )
+        .join('');
+    })
+    .catch(() => {});
+</script>
 </body>
 </html>
