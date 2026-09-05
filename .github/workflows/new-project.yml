@@ -59,5 +59,11 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ERROR_MESSAGE: ${{ steps.process.outputs.error }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Automation failed — see the run log: $RUN_URL"
+          if [ -n "$ERROR_MESSAGE" ]; then
+            BODY="Automation failed: $ERROR_MESSAGE"
+          else
+            BODY="Automation failed — see the run log: $RUN_URL"
+          fi
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "$BODY"

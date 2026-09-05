@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parseIssueBody, parseCheckedTags, parseFreeTags, extractImageUrls } from './lib/parse-issue.js';
+import { parseIssueBody, parseCheckedTags, parseFreeTags, extractImageUrls, looksLikeImageMarkup } from './lib/parse-issue.js';
 import { fetchImage } from './lib/fetch-image.js';
 import { resizeForWeb } from './lib/resize-image.js';
 import { slugify, uniqueSlug } from './lib/slug.js';
@@ -44,6 +44,11 @@ async function main() {
   const photoUrls = extractImageUrls(fields['Project Photos']);
   if (photoUrls.length === 0) {
     throw new Error('No photos found in the "Project Photos" field');
+  }
+  if (looksLikeImageMarkup(fields['Description'])) {
+    throw new Error(
+      'The "Description" field looks like it has a photo dropped into it instead of a written description. Please open a new issue with photos only in the "Project Photos" box, and a plain-text description.'
+    );
   }
 
   const projects = await loadProjects();
@@ -102,7 +107,12 @@ async function main() {
   console.log(`Published project "${record.title}" as ${slug}`);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err.message);
+  const githubOutput = process.env.GITHUB_OUTPUT;
+  if (githubOutput) {
+    const delimiter = `EOF_${Date.now()}`;
+    await writeFile(githubOutput, `error<<${delimiter}\n${err.message}\n${delimiter}\n`, { flag: 'a' });
+  }
   process.exit(1);
 });
