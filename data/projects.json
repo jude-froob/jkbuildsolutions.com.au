@@ -1,30 +1,5 @@
 [
   {
-    "slug": "5",
-    "title": "5",
-    "location": "retret",
-    "scope": "5",
-    "size": "5 x 5",
-    "materials": "colorbond 5",
-    "duration": "5 weeks",
-    "description": "lots of info here. lots of info here. lots of info here.\r\nlots of info here. lots of info here. lots of info here.",
-    "tags": [
-      "Council approved",
-      "Engineered",
-      "Fully managed",
-      "Custom design"
-    ],
-    "photos": [
-      "photos/projects/5/photo-1.jpg",
-      "photos/projects/5/photo-2.jpg",
-      "photos/projects/5/photo-3.jpg"
-    ],
-    "pdf": "project-sheets/5.pdf",
-    "issueNumber": 10,
-    "submittedAt": "2026-09-05T06:59:24.878Z",
-    "preview": "project-sheets/5-preview.jpg"
-  },
-  {
     "slug": "24m-x-10m-dream-shed",
     "title": "24m x 10m Dream Shed",
     "location": "Worongary QLD",
