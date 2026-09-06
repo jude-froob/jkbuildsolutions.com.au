@@ -23,5 +23,31 @@
     "issueNumber": 10,
     "submittedAt": "2026-09-05T06:59:24.878Z",
     "preview": "project-sheets/5-preview.jpg"
+  },
+  {
+    "slug": "24m-x-10m-dream-shed",
+    "title": "24m x 10m Dream Shed",
+    "location": "Worongary QLD",
+    "scope": "Shed design, Planning and construction",
+    "size": "24m x 10m",
+    "materials": "Colorbond Steel in Monument",
+    "duration": "8 weeks",
+    "description": "We designed this dream customised shed for a customer with a large car collection. Together with the design and engineering team at Stratco we came up with a practical solution that fit well and minimised  the planning constraints for the site.",
+    "tags": [
+      "Council approved",
+      "Engineered",
+      "Fully managed",
+      "Custom design",
+      "Earthworks"
+    ],
+    "photos": [
+      "photos/projects/24m-x-10m-dream-shed/photo-1.jpg",
+      "photos/projects/24m-x-10m-dream-shed/photo-2.jpg",
+      "photos/projects/24m-x-10m-dream-shed/photo-3.jpg"
+    ],
+    "pdf": "project-sheets/24m-x-10m-dream-shed.pdf",
+    "preview": "project-sheets/24m-x-10m-dream-shed-preview.jpg",
+    "issueNumber": 31,
+    "submittedAt": "2026-09-06T02:01:45.898Z"
   }
 ]
