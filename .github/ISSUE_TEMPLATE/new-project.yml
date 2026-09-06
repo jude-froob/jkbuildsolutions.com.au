@@ -67,6 +67,12 @@ body:
         - label: Engineered
         - label: Fully managed
         - label: Custom design
+        - label: Plumbing
+        - label: Electrical
+        - label: Earthworks
+        - label: Driveway
+        - label: Landscaping
+        - label: Retaining wall
   - type: input
     id: tags-other
     attributes:
