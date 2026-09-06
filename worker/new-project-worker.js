@@ -12,7 +12,18 @@ const BRANCH = 'main';
 const ALLOWED_ORIGIN = 'https://jude-froob.github.io';
 const MAX_PHOTOS = 8;
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
-const FIXED_TAGS = ['Council approved', 'Engineered', 'Fully managed', 'Custom design'];
+const FIXED_TAGS = [
+  'Council approved',
+  'Engineered',
+  'Fully managed',
+  'Custom design',
+  'Plumbing',
+  'Electrical',
+  'Earthworks',
+  'Driveway',
+  'Landscaping',
+  'Retaining wall',
+];
 const REQUIRED_TEXT_FIELDS = [
   ['project-title', 'Project title'],
   ['location', 'Location'],
