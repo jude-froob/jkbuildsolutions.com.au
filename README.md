@@ -93,7 +93,9 @@ Worker:
    in this repo, so this only matters if you rename the Worker.
 
 ## Open items
-- Domain DNS is at SiteGround (user-controlled) — repoint to GitHub Pages at cutover
+- `CNAME` now points Pages at `jkbuildsolutions.com.au`. DNS for the domain
+  is still at SiteGround (user-controlled) — repoint it to GitHub Pages to
+  complete cutover (see repo owner for the DNS records to set).
 - Design direction: rebuilding with the Claude Design skill rather than the
   old Idea_1 mockup (deemed too plain, removed 2026-09-05)
 
