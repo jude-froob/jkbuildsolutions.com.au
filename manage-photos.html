@@ -42,6 +42,13 @@
   #gallery-previews .thumb.error { display:flex; align-items:center; justify-content:center; width:140px; height:105px; font-size: 11px; text-align:center; padding: 6px; color: oklch(45% 0.14 30); border-radius: 4px; background: oklch(96% 0.02 30); }
   #gallery-previews .thumb input[type="text"] { margin-top: 6px; font-size: 12px; padding: 6px 8px; }
 
+  #gallery-current-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+  #gallery-current-grid .g-thumb { position: relative; width: 140px; cursor: pointer; }
+  #gallery-current-grid .g-thumb img { width: 140px; height: 105px; object-fit: cover; border-radius: 4px; display:block; background: oklch(90% 0.005 75); }
+  #gallery-current-grid .g-thumb.marked img { outline: 3px solid oklch(45% 0.18 30); outline-offset: -3px; opacity: .5; }
+  #gallery-current-grid .g-thumb .g-check { position: absolute; top: 8px; right: 8px; width: 18px; height: 18px; }
+  #gallery-current-grid .g-empty { font-size: 13px; color: oklch(45% 0.005 75); }
+
   .slot-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 28px; }
   .slot-card { border: 1px solid oklch(85% 0.005 75); border-radius: 6px; padding: 18px; background: oklch(99% 0.002 80); }
   .slot-card h4 { margin: 0 0 12px; font-size: 13px; letter-spacing: .06em; color: oklch(45% 0.005 75); }
@@ -96,13 +103,31 @@
   <!-- GALLERY TAB -->
   <div style="padding: 0 64px 72px; max-width: 880px; margin: 0 auto;">
     <div id="gallery-tab" class="tab-panel active">
+      <div class="field">
+        <label>Current gallery photos</label>
+        <div id="gallery-current-grid"><span class="g-empty">Loading current photos&hellip;</span></div>
+        <form id="gallery-delete-form" style="margin-top: 14px;">
+          <div class="field">
+            <label for="gallery-delete-passphrase">Access passphrase</label>
+            <input type="password" id="gallery-delete-passphrase" name="passphrase" required autocomplete="off">
+          </div>
+          <button type="submit" class="submit-btn" id="gallery-delete-btn" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/></svg>
+            Delete selected
+          </button>
+          <div id="gallery-delete-status" class="status-msg"></div>
+        </form>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid oklch(88% 0.005 75); margin: 32px 0;">
+
       <form id="gallery-form">
         <div class="field">
           <label for="gallery-passphrase">Access passphrase</label>
           <input type="password" id="gallery-passphrase" name="passphrase" required autocomplete="off">
         </div>
         <div class="field">
-          <label for="gallery-photos-input">Photos to add</label>
+          <label for="gallery-photos-input">Add new photos</label>
           <input type="file" id="gallery-photos-input" accept="image/*" multiple required>
           <div id="gallery-previews"></div>
         </div>
@@ -172,7 +197,99 @@
     }
   }
 
-  // ---------- Gallery tab ----------
+  // ---------- Gallery tab: current photos + delete ----------
+
+  const galleryCurrentGrid = document.getElementById('gallery-current-grid');
+  const galleryDeleteForm = document.getElementById('gallery-delete-form');
+  const galleryDeleteBtn = document.getElementById('gallery-delete-btn');
+  const galleryDeleteStatus = document.getElementById('gallery-delete-status');
+
+  let galleryCurrentData = []; // [{src, alt}]
+  let gallerySelectedForDelete = new Set();
+
+  function renderGalleryCurrentGrid() {
+    galleryCurrentGrid.innerHTML = '';
+    if (galleryCurrentData.length === 0) {
+      galleryCurrentGrid.innerHTML = '<span class="g-empty">No photos in the gallery yet.</span>';
+      return;
+    }
+    galleryCurrentData.forEach((photo, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'g-thumb' + (gallerySelectedForDelete.has(i) ? ' marked' : '');
+      thumb.innerHTML = `
+        <img src="${photo.src}" alt="">
+        <input type="checkbox" class="g-check" ${gallerySelectedForDelete.has(i) ? 'checked' : ''}>
+      `;
+      const checkbox = thumb.querySelector('.g-check');
+      const toggle = () => {
+        checkbox.checked = !checkbox.checked;
+        if (checkbox.checked) gallerySelectedForDelete.add(i);
+        else gallerySelectedForDelete.delete(i);
+        thumb.classList.toggle('marked', checkbox.checked);
+        galleryDeleteBtn.disabled = gallerySelectedForDelete.size === 0;
+      };
+      checkbox.addEventListener('click', (e) => e.stopPropagation());
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) gallerySelectedForDelete.add(i);
+        else gallerySelectedForDelete.delete(i);
+        thumb.classList.toggle('marked', checkbox.checked);
+        galleryDeleteBtn.disabled = gallerySelectedForDelete.size === 0;
+      });
+      thumb.addEventListener('click', toggle);
+      galleryCurrentGrid.appendChild(thumb);
+    });
+  }
+
+  function loadGalleryCurrent() {
+    return fetch('data/gallery.json')
+      .then((r) => r.json())
+      .then((data) => {
+        galleryCurrentData = Array.isArray(data) ? data : [];
+        gallerySelectedForDelete = new Set();
+        renderGalleryCurrentGrid();
+      })
+      .catch(() => {
+        galleryCurrentGrid.innerHTML = '<span class="g-empty">Could not load current gallery photos.</span>';
+      });
+  }
+  loadGalleryCurrent();
+
+  galleryDeleteForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    galleryDeleteStatus.textContent = '';
+    galleryDeleteStatus.className = 'status-msg';
+
+    if (gallerySelectedForDelete.size === 0) return;
+
+    galleryDeleteBtn.disabled = true;
+    galleryDeleteStatus.textContent = 'Deleting…';
+
+    try {
+      const fd = new FormData();
+      fd.append('action', 'gallery-delete');
+      fd.append('passphrase', document.getElementById('gallery-delete-passphrase').value);
+      [...gallerySelectedForDelete].forEach((i) => fd.append('indices', String(i)));
+      const count = gallerySelectedForDelete.size;
+
+      const res = await fetch(WORKER_URL, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || `Delete failed (${res.status})`);
+
+      galleryDeleteStatus.textContent = `Deleted ${count} photo(s).`;
+      galleryDeleteStatus.className = 'status-msg success';
+      document.getElementById('gallery-delete-passphrase').value = '';
+      galleryCurrentData = data.gallery || [];
+      gallerySelectedForDelete = new Set();
+      renderGalleryCurrentGrid();
+    } catch (err) {
+      galleryDeleteStatus.textContent = err.message;
+      galleryDeleteStatus.className = 'status-msg error';
+    } finally {
+      galleryDeleteBtn.disabled = gallerySelectedForDelete.size === 0;
+    }
+  });
+
+  // ---------- Gallery tab: add photos ----------
 
   const galleryForm = document.getElementById('gallery-form');
   const galleryPhotosInput = document.getElementById('gallery-photos-input');
@@ -248,6 +365,7 @@
       galleryForm.reset();
       galleryPreviews.innerHTML = '';
       galleryResized = [];
+      loadGalleryCurrent();
     } catch (err) {
       galleryStatus.textContent = err.message;
       galleryStatus.className = 'status-msg error';

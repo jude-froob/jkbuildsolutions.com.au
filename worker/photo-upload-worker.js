@@ -127,6 +127,47 @@ async function handleGalleryAdd(formData, env) {
   return json(201, { ok: true, added: photos.length });
 }
 
+async function deleteRepoFile(env, path, message) {
+  const existing = await githubApi(env, `/repos/${OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`);
+  if (!existing.ok) return; // already gone
+  const sha = (await existing.json()).sha;
+  await githubApi(env, `/repos/${OWNER}/${REPO_NAME}/contents/${path}`, {
+    method: 'DELETE',
+    body: JSON.stringify({ message, sha, branch: BRANCH }),
+  });
+}
+
+async function handleGalleryDelete(formData, env) {
+  const indices = formData.getAll('indices').map((v) => parseInt(v, 10)).filter(Number.isInteger);
+  if (indices.length === 0) {
+    return json(400, { ok: false, error: 'No photos selected' });
+  }
+
+  const { sha, content } = await getJsonFile(env, 'data/gallery.json');
+  const gallery = Array.isArray(content) ? content : [];
+
+  const toDelete = new Set(indices);
+  const remaining = [];
+  const removed = [];
+  gallery.forEach((entry, i) => {
+    if (toDelete.has(i)) removed.push(entry);
+    else remaining.push(entry);
+  });
+
+  if (removed.length === 0) {
+    return json(400, { ok: false, error: 'Selected photos were not found' });
+  }
+
+  for (const entry of removed) {
+    if (entry && entry.src) {
+      await deleteRepoFile(env, entry.src, 'Remove photo from gallery');
+    }
+  }
+
+  await putJsonFile(env, 'data/gallery.json', remaining, sha, `Delete ${removed.length} photo(s) from gallery`);
+  return json(200, { ok: true, gallery: remaining });
+}
+
 async function handleRecentUpdate(formData, env) {
   const { sha, content } = await getJsonFile(env, 'data/recent-projects.json');
   const current = Array.isArray(content) ? content : [];
@@ -172,6 +213,7 @@ async function handlePost(request, env) {
 
   const action = (formData.get('action') || '').toString();
   if (action === 'gallery-add') return handleGalleryAdd(formData, env);
+  if (action === 'gallery-delete') return handleGalleryDelete(formData, env);
   if (action === 'recent-update') return handleRecentUpdate(formData, env);
   return json(400, { ok: false, error: `Unknown action: "${action}"` });
 }
