@@ -9,24 +9,32 @@
 const OWNER = 'jude-froob';
 const REPO_NAME = 'jkbuildsolutions.com.au';
 const BRANCH = 'main';
-const ALLOWED_ORIGIN = 'https://jude-froob.github.io';
+// The site has moved between hosts before (github.io -> the custom domain),
+// and HTTPS enforcement can lag a DNS cutover -- allow-list every origin the
+// live site might actually be served from rather than hardcoding one.
+const ALLOWED_ORIGINS = new Set([
+  'https://jude-froob.github.io',
+  'https://jkbuildsolutions.com.au',
+  'http://jkbuildsolutions.com.au',
+]);
+const DEFAULT_ORIGIN = 'https://jkbuildsolutions.com.au';
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 const MAX_GALLERY_PHOTOS = 10;
 const RECENT_PROJECTS_SLOTS = 4;
 
-function corsHeaders() {
+function corsHeaders(origin) {
   return {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.has(origin) ? origin : DEFAULT_ORIGIN,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     Vary: 'Origin',
   };
 }
 
-function json(status, body) {
+function json(status, body, origin) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
   });
 }
 
@@ -94,22 +102,22 @@ async function putPhotoFile(env, path, file, message) {
   if (!res.ok) throw new Error(`Failed to upload photo to ${path}: ${res.status}`);
 }
 
-async function handleGalleryAdd(formData, env) {
+async function handleGalleryAdd(formData, env, origin) {
   const photos = formData.getAll('photos').filter((p) => p instanceof File);
   const alts = formData.getAll('alts').map(String);
 
   if (photos.length === 0) {
-    return json(400, { ok: false, error: 'Please attach at least one photo' });
+    return json(400, { ok: false, error: 'Please attach at least one photo' }, origin);
   }
   if (photos.length > MAX_GALLERY_PHOTOS) {
-    return json(400, { ok: false, error: `Please attach at most ${MAX_GALLERY_PHOTOS} photos` });
+    return json(400, { ok: false, error: `Please attach at most ${MAX_GALLERY_PHOTOS} photos` }, origin);
   }
   for (const file of photos) {
     if (!file.type.startsWith('image/')) {
-      return json(400, { ok: false, error: `"${file.name}" is not an image` });
+      return json(400, { ok: false, error: `"${file.name}" is not an image` }, origin);
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      return json(400, { ok: false, error: `"${file.name}" is too large` });
+      return json(400, { ok: false, error: `"${file.name}" is too large` }, origin);
     }
   }
 
@@ -124,7 +132,7 @@ async function handleGalleryAdd(formData, env) {
   }
 
   await putJsonFile(env, 'data/gallery.json', gallery, sha, `Add ${photos.length} photo(s) to gallery`);
-  return json(201, { ok: true, added: photos.length });
+  return json(201, { ok: true, added: photos.length }, origin);
 }
 
 async function deleteRepoFile(env, path, message) {
@@ -137,10 +145,10 @@ async function deleteRepoFile(env, path, message) {
   });
 }
 
-async function handleGalleryDelete(formData, env) {
+async function handleGalleryDelete(formData, env, origin) {
   const indices = formData.getAll('indices').map((v) => parseInt(v, 10)).filter(Number.isInteger);
   if (indices.length === 0) {
-    return json(400, { ok: false, error: 'No photos selected' });
+    return json(400, { ok: false, error: 'No photos selected' }, origin);
   }
 
   const { sha, content } = await getJsonFile(env, 'data/gallery.json');
@@ -155,7 +163,7 @@ async function handleGalleryDelete(formData, env) {
   });
 
   if (removed.length === 0) {
-    return json(400, { ok: false, error: 'Selected photos were not found' });
+    return json(400, { ok: false, error: 'Selected photos were not found' }, origin);
   }
 
   for (const entry of removed) {
@@ -165,10 +173,10 @@ async function handleGalleryDelete(formData, env) {
   }
 
   await putJsonFile(env, 'data/gallery.json', remaining, sha, `Delete ${removed.length} photo(s) from gallery`);
-  return json(200, { ok: true, gallery: remaining });
+  return json(200, { ok: true, gallery: remaining }, origin);
 }
 
-async function handleRecentUpdate(formData, env) {
+async function handleRecentUpdate(formData, env, origin) {
   const { sha, content } = await getJsonFile(env, 'data/recent-projects.json');
   const current = Array.isArray(content) ? content : [];
 
@@ -181,10 +189,10 @@ async function handleRecentUpdate(formData, env) {
 
     if (file instanceof File) {
       if (!file.type.startsWith('image/')) {
-        return json(400, { ok: false, error: `Slot ${i + 1} photo is not an image` });
+        return json(400, { ok: false, error: `Slot ${i + 1} photo is not an image` }, origin);
       }
       if (file.size > MAX_PHOTO_BYTES) {
-        return json(400, { ok: false, error: `Slot ${i + 1} photo is too large` });
+        return json(400, { ok: false, error: `Slot ${i + 1} photo is too large` }, origin);
       }
       const path = `assets/home/recent-${i + 1}.jpg`;
       await putPhotoFile(env, path, file, `Update recent-projects photo ${i + 1}`);
@@ -201,35 +209,36 @@ async function handleRecentUpdate(formData, env) {
   }
 
   await putJsonFile(env, 'data/recent-projects.json', slots, sha, 'Update recent projects photos');
-  return json(200, { ok: true, slots });
+  return json(200, { ok: true, slots }, origin);
 }
 
-async function handlePost(request, env) {
+async function handlePost(request, env, origin) {
   const formData = await request.formData();
 
   if (formData.get('passphrase') !== env.FORM_PASSPHRASE) {
-    return json(401, { ok: false, error: 'Incorrect passphrase' });
+    return json(401, { ok: false, error: 'Incorrect passphrase' }, origin);
   }
 
   const action = (formData.get('action') || '').toString();
-  if (action === 'gallery-add') return handleGalleryAdd(formData, env);
-  if (action === 'gallery-delete') return handleGalleryDelete(formData, env);
-  if (action === 'recent-update') return handleRecentUpdate(formData, env);
-  return json(400, { ok: false, error: `Unknown action: "${action}"` });
+  if (action === 'gallery-add') return handleGalleryAdd(formData, env, origin);
+  if (action === 'gallery-delete') return handleGalleryDelete(formData, env, origin);
+  if (action === 'recent-update') return handleRecentUpdate(formData, env, origin);
+  return json(400, { ok: false, error: `Unknown action: "${action}"` }, origin);
 }
 
 export default {
   async fetch(request, env) {
+    const origin = request.headers.get('Origin');
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders() });
+      return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
     if (request.method !== 'POST') {
-      return json(405, { ok: false, error: 'Method not allowed' });
+      return json(405, { ok: false, error: 'Method not allowed' }, origin);
     }
     try {
-      return await handlePost(request, env);
+      return await handlePost(request, env, origin);
     } catch (err) {
-      return json(500, { ok: false, error: err.message });
+      return json(500, { ok: false, error: err.message }, origin);
     }
   },
 };
