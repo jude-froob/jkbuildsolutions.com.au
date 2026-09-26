@@ -50,5 +50,32 @@
     "preview": "project-sheets/bespoke-garden-spa-preview.jpg",
     "issueNumber": 40,
     "submittedAt": "2026-09-26T12:09:15.603Z"
+  },
+  {
+    "slug": "bespoke-garden-spa-2",
+    "title": "Bespoke Garden Spa",
+    "location": "Bonogin",
+    "scope": "Custom building design and build",
+    "size": "6m x 6m",
+    "materials": "Stratco Highland tray cladding with Stratco Cooldek roof panels",
+    "duration": "4 Weeks",
+    "description": "We were commissioned to design a garden spa positioned to take advantage of sweeping hinterland views. Maximising the connection to the landscape was a key design driver, leading to the inclusion of large-scale glazing throughout the front elevation. A custom-engineered steel frame was designed and fabricated to accommodate a 5.8m x 2.2 m sliding glass door assembly. Together with the clean lines of the Highland Tray cladding, the glazing creates a refined contemporary form that responds sensitively to its environment while providing an exceptional indoor-outdoor experience.",
+    "tags": [
+      "Council approved",
+      "Engineered",
+      "Fully managed",
+      "Custom design",
+      "Electrical",
+      "Earthworks"
+    ],
+    "photos": [
+      "photos/projects/bespoke-garden-spa-2/photo-1.jpg",
+      "photos/projects/bespoke-garden-spa-2/photo-2.jpg",
+      "photos/projects/bespoke-garden-spa-2/photo-3.jpg"
+    ],
+    "pdf": "project-sheets/bespoke-garden-spa-2.pdf",
+    "preview": "project-sheets/bespoke-garden-spa-2-preview.jpg",
+    "issueNumber": 42,
+    "submittedAt": "2026-09-26T12:10:08.560Z"
   }
 ]
