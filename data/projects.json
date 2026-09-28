@@ -51,5 +51,31 @@
     "preview": "project-sheets/bespoke-garden-spa-preview.jpg",
     "issueNumber": 42,
     "submittedAt": "2026-09-26T12:10:08.560Z"
+  },
+  {
+    "slug": "custom-shed-conversion",
+    "title": "Custom shed conversion",
+    "location": "Tamborine Village Qld",
+    "scope": "Shed conversion",
+    "size": "7m x 3 m",
+    "materials": "Timber framing",
+    "duration": "8 weeks",
+    "description": "What was once unused shed space has been transformed into a striking modern office tailored to the owner's needs. The addition of a sleek awning and deck enhances both function and aesthetics, capturing picturesque views across the dam while blending the surrounding landscape with a contemporary interior.",
+    "tags": [
+      "Fully managed",
+      "Custom design",
+      "Plumbing",
+      "Electrical"
+    ],
+    "photos": [
+      "photos/projects/custom-shed-conversion/photo-1.jpg",
+      "photos/projects/custom-shed-conversion/photo-2.jpg",
+      "photos/projects/custom-shed-conversion/photo-3.jpg",
+      "photos/projects/custom-shed-conversion/photo-4.jpg"
+    ],
+    "pdf": "project-sheets/custom-shed-conversion.pdf",
+    "preview": "project-sheets/custom-shed-conversion-preview.jpg",
+    "issueNumber": 46,
+    "submittedAt": "2026-09-28T12:04:17.820Z"
   }
 ]
